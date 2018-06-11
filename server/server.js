@@ -26,3 +26,7 @@ app.post('/todos' , (req, res)=>{ //send data to a server - to todos , save in D
 app.listen(3000 , ()=>{
     console.log('Started on port 3000');
 });
+
+module.exports = {
+    app
+};
