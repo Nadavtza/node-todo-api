@@ -1,3 +1,5 @@
+require('./config/config');
+
 //library exports
 const express = require('express');
 const bodyParser = require('body-parser');
