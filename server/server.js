@@ -1,12 +1,13 @@
 //library exports
-var express = require('express');
-var bodyParser = require('body-parser');
-var {ObjectID} = require('mongodb');
+const express = require('express');
+const bodyParser = require('body-parser');
+const {ObjectID} = require('mongodb');
+const _ = require('lodash');
 
 //Local exports
-var {mongoose} = require('./db/mongoose');
-var {Todo} = require('./models/todo');
-var {User} = require('./models/user');
+const {mongoose} = require('./db/mongoose');
+const {Todo} = require('./models/todo');
+const {User} = require('./models/user');
 
 
 
@@ -16,6 +17,7 @@ const port = process.env.PORT ||3000 ;
 
 app.use(bodyParser.json());
 
+//post route
 app.post('/todos' , (req, res)=>{ //send data to a server - to todos , save in DB and response
                                 //using POSTMAN for debug
     var todo = new Todo({
@@ -37,6 +39,7 @@ app.get('/todos' , (req , res) => {
     });
 });
 
+//get route
 app.get('/todos/:id' , (req , res) => {
     var id = req.params.id ;
 
@@ -55,6 +58,7 @@ app.get('/todos/:id' , (req , res) => {
     });
 });
 
+//delete route
 app.delete('/todos/:id' , (req , res) => {
     var id = req.params.id ;
 
@@ -73,8 +77,35 @@ app.delete('/todos/:id' , (req , res) => {
     });
 });
 
+//update route
+app.patch('/todos/:id' , (req , res) => {
+    var id = req.params.id ; 
+    var body = _.pick(req.body , ['text' , 'completed']); // pick only those we want to edit  
+
+    if(!ObjectID.isValid(id)){
+        return res.status(404).send({message:'ID not valid'});
+    }
+
+    if(_.isBoolean(body.completed) && body.completed) {
+        body.completedAt = new Date().getTime();
+    }
+    else {
+        body.completed = false ; 
+        body.completedAt = null;
+    }
+
+    Todo.findByIdAndUpdate(id , {$set: body} ,{new: true}).then((todo)=>{
+        if(!todo){
+            return res.status(404).send({message:'ID not found'});
+        }
+        res.send({message: 'Todo updated:',
+        todo});
+    } , (e) =>{
+        res.status(400).send();
+    });
 
 
+});
 
 app.listen(port , ()=>{
     console.log('Started on port ' , port);
