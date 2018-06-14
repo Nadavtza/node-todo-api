@@ -114,7 +114,7 @@ app.patch('/todos/:id' , (req , res) => {
 });
 
 //users
-//POST route
+//POST route for sign in
 app.post('/users' , (req, res)=>{ 
     var body = _.pick(req.body , ['name' , 'email', 'password']);
     var user = new User(body);
