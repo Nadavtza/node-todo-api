@@ -4,9 +4,10 @@ const {ObjectID} = require('mongodb');
 
 const {app} = require('./../server');
 const {User} = require('./../models/user');
-const {populateUsers ,users} = require('./seed/seed');
+const {populateUsers ,users,todos, populateToods} = require('./seed/seed');
 
 beforeEach(populateUsers);
+beforeEach(populateToods);
 
 
 //Test GET /users/me
@@ -123,8 +124,8 @@ describe('POST /users/login' , ()=>{
                 return done(err);
             }
             User.findById(users[1]._id).then( (user) =>{
-                expect(user.tokens[0]).toHaveProperty('access' , 'auth');
-                expect(user.tokens[0]).toHaveProperty('token' , res.headers['x-auth']);
+                expect(user.tokens[1]).toHaveProperty('access' , 'auth');
+                expect(user.tokens[1]).toHaveProperty('token' , res.headers['x-auth']);
                 done();
             }).catch((e) => done(e));
         }); 
@@ -146,7 +147,7 @@ describe('POST /users/login' , ()=>{
                 return done(err);
             }
             User.findById(users[1]._id).then( (user) =>{
-                expect(user.tokens.length).toBe(0);
+                expect(user.tokens.length).toBe(1);
                 done();
             }).catch((e) => done(e));
         }); 
